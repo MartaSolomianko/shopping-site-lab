@@ -69,7 +69,6 @@ def add_to_cart(melon_id):
     # TODO: Finish shopping cart functionality
 
     # The logic here should be something like:
-    #
     # - check if a "cart" exists in the session, and create one (an empty
     if 'cart' in session:
         cart = session['cart']
@@ -79,16 +78,16 @@ def add_to_cart(melon_id):
     # if 'cart' not in request.session: 
     # - check if the desired melon id is the cart, and if not, put it in
     cart[melon_id] = cart.get(melon_id,0) + 1
-    
+
     # session.get('melon_id')
     # if session['cart'] 
-    session.modified = True
+    #session.modified = True
     # - increment the count for that melon id by 1
     # - flash a success message
     flash("You've added a melon!")
     # - redirect the user to the cart page
 
-    return 
+    return redirect('/cart')
 
 @app.route("/cart")
 def show_shopping_cart():
@@ -97,22 +96,32 @@ def show_shopping_cart():
     # TODO: Display the contents of the shopping cart.
 
     # The logic here will be something like:
-    #
+    cart_melons = []
     # - get the cart dictionary from the session
+    order_total = 0
     # - create a list to hold melon objects and a variable to hold the total
     #   cost of the order
     # - loop over the cart dictionary, and for each melon id:
-    #    - get the corresponding Melon object
+    cart = session.get('cart',{})
+
+    for melon_id, quantity in cart.items():
+    #    - get the corresponding Melon objects=me
+            melon = melons.get_by_id(melon_id)
     #    - compute the total cost for that type of melon
+            total_cost = quantity * melon.price
     #    - add this to the order total
+            order_total = order_total + total_cost
     #    - add quantity and total cost as attributes on the Melon object
     #    - add the Melon object to the list created above
+            melon.quantity = quantity
+            melon.total_cost = total_cost
+            cart_melons.append(melon)
     # - pass the total order cost and the list of Melon objects to the template
     #
     # Make sure your function can also handle the case wherein no cart has
     # been added to the session
 
-    return render_template("cart.html")
+    return render_template("cart.html", cart=cart_melons, order_total=order_total )
 
 @app.route("/login", methods=["GET"])
 def show_login():
